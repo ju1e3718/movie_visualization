@@ -1,0 +1,78 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Prevents scrollbars if content exceeds viewport */
+}
+
+/* Set up a flexbox layout for the entire page */
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+}
+
+a:link, a:visited {
+    text-decoration: none;
+    color: black;
+}
+
+/* Navigation bar */
+nav {
+    height: 90px;
+    line-height: 90px;
+    margin-top: 2%;
+}
+
+nav::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.nav-logo {
+    font-size: 30px;
+    float: left;
+    margin: 0;
+    padding-left: 5%;
+}
+
+.nav-btn {
+    float: left;
+    list-style: none;
+    margin: 0;
+}
+
+ul.nav-btn>li {
+    float: left;
+    margin-left: 60px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.search {
+    margin: 0 7%;
+    height: 100%;
+    float: right
+}
+
+/* #search-input {
+    border-radius: 4px;
+    height: 90%;
+    width: 50%;
+    font-size: large;
+}
+
+#search-button {
+    border-radius: 4px;
+    height: 98%;
+} */
+
+/* Styling for the network graph container */
+#network {
+    flex-grow: 1;
+    width: 100%;
+    height: calc(100vh - 90px); /* 100% viewport height minus nav height */
+    overflow: hidden; /* Prevents scrollbars if content exceeds container */
+}
