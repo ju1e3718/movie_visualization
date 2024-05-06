@@ -26,17 +26,37 @@
                 <li class="dropdown">
                     <a href="#">배급사</a>
                     <div class="dropdown-content">
-                        <a href="#" id="option-a-link">옵션 A</a>
-                        <a href="#" id="option-b-link">옵션 B</a>
-                        <a href="#">옵션 C</a>
+                        <a href="#" id="maker_audience-link">트리맵</a>
+                        <a href="#" id="maker_year_audience-link">연도별 관객수</a>
+                        <a href="#" id="maker_year_sales-link">연도별 매출액</a>
+                        <a href="#" id="maker_genre_sales-link">장르별 매출액</a>
+                        <a href="#" id="genre_maker_sales-link">장르 매출액</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="#">배우</a>
+                    <div class="dropdown-content">
+                        <a href="#" id="actor_audience_year-link">연도별 관객수</a>
+                        <a href="#" id="actor_genre_2000-link">2000s 장르별</a>
+                        <a href="#" id="actor_genre_2010-link">2010s 장르별</a>
+                        <a href="#" id="actor_genre_2020-link">2020s 장르별</a>
                     </div>
                 </li>
             </ul>
         </div>
     </nav>
 
-    <iframe id="option-a-iframe" src="sales_top10.html" width="100%" height="100%" style="display: none; border: none; overflow-y: auto;"></iframe>
-    <iframe id="option-b-iframe" src="audience_top10.html" width="100%" height="100%" style="display: none; border: none; overflow-y: auto;"></iframe>
+    <iframe id="maker_audience-iframe" src="de_maker_audience.html" width="100%" height="80%" style="border: none; overflow-y: auto;"></iframe>
+
+    <iframe id="actor_audience_year-iframe" src="jh_actor_audience_year.html" width="100%" height="800px" style="border: none; overflow-y: auto;"></iframe>
+    <iframe id="actor_genre_2000-iframe" src="jh_actor_genre_2000.html" width="100%" height="800px" style="border: none; overflow-y: auto;"></iframe>
+    <iframe id="actor_genre_2010-iframe" src="jh_actor_genre_2010.html"  width="100%" height="800px" style="border: none; overflow-y: auto;"></iframe>
+    <iframe id="actor_genre_2020-iframe" src="jh_actor_genre_2020.html"  width="100%" height="800px" style="border: none; overflow-y: auto;"></iframe>
+
+    <iframe id="maker_year_audience-iframe" src="hj_maker_year_audience.html"  width="100%" height="800px" style="border: none; overflow-y: auto;"></iframe>
+    <iframe id="maker_year_sales-iframe" src="hj_maker_year_sales.html"  width="100%" height="800px" style="border: none; overflow-y: auto;"></iframe>
+    <iframe id="maker_genre_sales-iframe" src="hj_maker_genre_sales.html"  width="100%" height="800px" style="border: none; overflow-y: auto;"></iframe>
+    <iframe id="genre_maker_sales-iframe" src="hj_genre_maker_sales.html"  width="100%" height="800px" style="border: none; overflow-y: auto;"></iframe>
 
     <div class="search" style="display: none;">
         <input type="text" id="search-input" placeholder="배우/감독 이름을 입력">
@@ -53,66 +73,67 @@
         function loadScript(file) {
             const existingScript = document.getElementById('dynamic-script');
             if (existingScript) existingScript.remove(); // Remove existing script
-
+    
             const script = document.createElement('script');
             script.id = 'dynamic-script';
             script.src = file;
             document.body.appendChild(script);
         }
-
+    
         // Function to show/hide elements
-        function toggleElements(iframeIdToShow, showSlider = false, showSearch = true) {
-            // Hide all iframes initially
-            document.getElementById('option-a-iframe').style.display = 'none';
-            document.getElementById('option-b-iframe').style.display = 'none';
-
+        function toggleElements(iframeIdToShow, showSlider = false, showSearch = false) {
+            // Hide all iframes and network graph initially
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => iframe.style.display = 'none');
+    
+            document.getElementById('network').style.display = 'none';
+            document.querySelector('.search').style.display = showSearch ? 'block' : 'none';
+            document.querySelector('.slider').style.display = showSlider ? 'block' : 'none';
+    
             // Show the selected iframe
             if (iframeIdToShow) {
                 document.getElementById(iframeIdToShow).style.display = 'block';
-                document.querySelector('.search').style.display = 'none';
-                document.querySelector('.slider').style.display = 'none';
-                document.getElementById('network').style.display = 'none';
             } else {
                 document.getElementById('network').style.display = 'block';
-                document.querySelector('.search').style.display = showSearch ? 'block' : 'none';
-                document.querySelector('.slider').style.display = showSlider ? 'block' : 'none';
             }
         }
-
+    
+        // Mapping for link id to iframe id or script
+        const menuConfig = {
+            'actors-link': { script: 'actors.js', showSearch: true, showSlider: false },
+            'actors2-link': { script: 'actors2.js', showSearch: false, showSlider: true },
+            'coach-link': { script: 'coach.js', showSearch: true, showSlider: false },
+            'actor_audience_year-link': { iframe: 'actor_audience_year-iframe', showSearch: false, showSlider: false },
+            'actor_genre_2000-link': { iframe: 'actor_genre_2000-iframe', showSearch: false, showSlider: false },
+            'actor_genre_2010-link': { iframe: 'actor_genre_2010-iframe', showSearch: false, showSlider: false },
+            'actor_genre_2020-link': { iframe: 'actor_genre_2020-iframe', showSearch: false, showSlider: false },
+            'maker_year_audience-link': { iframe: 'maker_year_audience-iframe', showSearch: false, showSlider: false },
+            'maker_year_sales-link': { iframe: 'maker_year_sales-iframe', showSearch: false, showSlider: false },
+            'maker_genre_sales-link': { iframe: 'maker_genre_sales-iframe', showSearch: false, showSlider: false },
+            'genre_maker_sales-link': { iframe: 'genre_maker_sales-iframe', showSearch: false, showSlider: false },
+            'maker_audience-link': { iframe: 'maker_audience-iframe', showSearch: false, showSlider: false }
+        };
+    
         // Event listeners for the links
-        document.getElementById('actors-link').addEventListener('click', function (event) {
-            event.preventDefault(); // Prevent link navigation
-            loadScript('actors.js'); // Load actors.js
-            toggleElements(null, false, true); // Show search, hide slider
-        });
-
-        document.getElementById('actors2-link').addEventListener('click', function (event) {
-            event.preventDefault(); // Prevent link navigation
-            loadScript('actors2.js'); // Load actors2.js
-            toggleElements(null, true, false); // Show slider, hide search
-        });
-
-        document.getElementById('coach-link').addEventListener('click', function (event) {
-            event.preventDefault(); // Prevent link navigation
-            loadScript('coach.js'); // Load coach.js
-            toggleElements(null, false, true); // Show search, hide slider
-        });
-
-        document.getElementById('option-a-link').addEventListener('click', function (event) {
-            event.preventDefault(); // Prevent link navigation
-            toggleElements('option-a-iframe'); // Show option-a-iframe
-        });
-
-        document.getElementById('option-b-link').addEventListener('click', function (event) {
-            event.preventDefault(); // Prevent link navigation
-            toggleElements('option-b-iframe'); // Show option-b-iframe
-        });
-
+        for (const [linkId, config] of Object.entries(menuConfig)) {
+            document.getElementById(linkId).addEventListener('click', function (event) {
+                event.preventDefault(); // Prevent link navigation
+    
+                if (config.script) {
+                    loadScript(config.script); // Load the corresponding script
+                    toggleElements(null, config.showSlider, config.showSearch); // Show/Hide search and slider
+                } else {
+                    toggleElements(config.iframe, config.showSlider, config.showSearch); // Show the corresponding iframe
+                }
+            });
+        }
+    
         // Load actors.js by default when the page is loaded
         window.addEventListener('load', function() {
             toggleElements(null, false, true); // Show search, hide slider
             loadScript('actors.js'); // Load actors.js by default
         });
     </script>
+    
 </body>
 </html>
