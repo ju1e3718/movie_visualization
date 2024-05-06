@@ -34,6 +34,16 @@
                     </div>
                 </li>
                 <li class="dropdown">
+                    <a href="#">장르</a>
+                    <div class="dropdown-content">
+                        <a href="#" id="genre_treemap-link">트리맵</a>
+                        <a href="#" id="genre_2000-link">2000s 장르별</a>
+                        <a href="#" id="genre_2010-link">2010s 장르별</a>
+                        <a href="#" id="genre_2020-link">2020s 장르별</a>
+                        <a href="#" id="genre_year-link">연도별 장르</a>
+                    </div>
+                </li>
+                <li class="dropdown">
                     <a href="#">배우</a>
                     <div class="dropdown-content">
                         <a href="#" id="actor_audience_year-link">연도별 관객수</a>
@@ -46,12 +56,18 @@
         </div>
     </nav>
 
-    <iframe id="maker_audience-iframe" src="de_maker_audience.html" width="100%" height="80%" style="border: none; overflow-y: auto;"></iframe>
+    <iframe id="maker_audience-iframe" src="de_maker_audience.html" width="100%" height="800px" style="overflow-y: auto; border: none;"></iframe>
 
     <iframe id="actor_audience_year-iframe" src="jh_actor_audience_year.html" width="100%" height="800px" style="border: none; overflow-y: auto;"></iframe>
     <iframe id="actor_genre_2000-iframe" src="jh_actor_genre_2000.html" width="100%" height="800px" style="border: none; overflow-y: auto;"></iframe>
     <iframe id="actor_genre_2010-iframe" src="jh_actor_genre_2010.html"  width="100%" height="800px" style="border: none; overflow-y: auto;"></iframe>
     <iframe id="actor_genre_2020-iframe" src="jh_actor_genre_2020.html"  width="100%" height="800px" style="border: none; overflow-y: auto;"></iframe>
+
+    <iframe id="genre_treemap-iframe" src="yj_treemap.html"  width="100%" height="100%" style="border: none; overflow-y: auto;"></iframe>
+    <iframe id="genre_2000-iframe" src="yj_decade2000_genre.html"  width="100%" height="100%" style="border: none; overflow-y: auto;"></iframe>
+    <iframe id="genre_2010-iframe" src="yj_decade2010_genre.html"  width="100%" height="100%" style="border: none; overflow-y: auto;"></iframe>
+    <iframe id="genre_2020-iframe" src="yj_decade2020_genre.html"  width="100%" height="100%" style="border: none; overflow-y: auto;"></iframe>
+    <iframe id="genre_year-iframe" src="yj_year_genre.html"  width="100%" height="100%" style="border: none; overflow-y: auto;"></iframe>
 
     <iframe id="maker_year_audience-iframe" src="hj_maker_year_audience.html"  width="100%" height="800px" style="border: none; overflow-y: auto;"></iframe>
     <iframe id="maker_year_sales-iframe" src="hj_maker_year_sales.html"  width="100%" height="800px" style="border: none; overflow-y: auto;"></iframe>
@@ -81,21 +97,19 @@
         }
     
         // Function to show/hide elements
-        function toggleElements(iframeIdToShow, showSlider = false, showSearch = false) {
+        function toggleElements(iframeIdToShow, showSlider = false, showSearch = false, script = null) {
             // Hide all iframes and network graph initially
             const iframes = document.querySelectorAll('iframe');
             iframes.forEach(iframe => iframe.style.display = 'none');
-    
             document.getElementById('network').style.display = 'none';
             document.querySelector('.search').style.display = showSearch ? 'block' : 'none';
             document.querySelector('.slider').style.display = showSlider ? 'block' : 'none';
-    
-            // Show the selected iframe
             if (iframeIdToShow) {
                 document.getElementById(iframeIdToShow).style.display = 'block';
             } else {
                 document.getElementById('network').style.display = 'block';
             }
+            if (script) loadScript(script); // Load the new script if provided
         }
     
         // Mapping for link id to iframe id or script
@@ -111,27 +125,25 @@
             'maker_year_sales-link': { iframe: 'maker_year_sales-iframe', showSearch: false, showSlider: false },
             'maker_genre_sales-link': { iframe: 'maker_genre_sales-iframe', showSearch: false, showSlider: false },
             'genre_maker_sales-link': { iframe: 'genre_maker_sales-iframe', showSearch: false, showSlider: false },
-            'maker_audience-link': { iframe: 'maker_audience-iframe', showSearch: false, showSlider: false }
+            'maker_audience-link': { iframe: 'maker_audience-iframe', showSearch: false, showSlider: false },
+            'genre_2000-link': { iframe: 'genre_2000-iframe', showSearch: false, showSlider: false },
+            'genre_2010-link': { iframe: 'genre_2010-iframe', showSearch: false, showSlider: false },
+            'genre_2020-link': { iframe: 'genre_2020-iframe', showSearch: false, showSlider: false },
+            'genre_treemap-link': { iframe: 'genre_treemap-iframe', showSearch: false, showSlider: false },
+            'genre_year-link': { iframe: 'genre_year-iframe', showSearch: false, showSlider: false }
         };
-    
+
         // Event listeners for the links
         for (const [linkId, config] of Object.entries(menuConfig)) {
             document.getElementById(linkId).addEventListener('click', function (event) {
-                event.preventDefault(); // Prevent link navigation
-    
-                if (config.script) {
-                    loadScript(config.script); // Load the corresponding script
-                    toggleElements(null, config.showSlider, config.showSearch); // Show/Hide search and slider
-                } else {
-                    toggleElements(config.iframe, config.showSlider, config.showSearch); // Show the corresponding iframe
-                }
+                event.preventDefault();
+                toggleElements(config.iframe, config.showSlider, config.showSearch, config.script);
             });
         }
     
         // Load actors.js by default when the page is loaded
         window.addEventListener('load', function() {
-            toggleElements(null, false, true); // Show search, hide slider
-            loadScript('actors.js'); // Load actors.js by default
+            toggleElements(null, false, true, 'actors.js'); // Show search, hide slider, load actors.js by default
         });
     </script>
     
