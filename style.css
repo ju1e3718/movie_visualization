@@ -83,9 +83,15 @@ ul.nav-btn>li {
 }
 
 .search {
-    margin: 2% 7%;
-    height: 7%;
-    float: right
+    margin: 2% 0 0 7%;
+    height: 5%;
+    float: right;
+}
+
+.slider {
+    margin: 2% 0 0 7%;
+    height: 5%;
+    float: right;
 }
 
 /* #search-input {
