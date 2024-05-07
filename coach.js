@@ -7,44 +7,48 @@
 
     // Process each movie to establish relationships and calculate audience counts
     movies.forEach(movie => {
-        const coach = movie.coach;
+        const coachKey = `감독_${movie.coach}`;
+        const coachDisplayName = movie.coach;
         const audienceCount = parseInt(movie['관객수'].replace(/,/g, ''), 10);
         const mainActors = movie.actor_main_name || [];
-        coachSet.add(coach); // Mark this as a coach
+        coachSet.add(coachKey); // Mark this as a coach
 
         mainActors.forEach(actor => {
-            const pairKey = `${coach}-${actor}`;
+            const actorKey = `배우_${actor}`;
+            const actorDisplayName = actor;
+            const pairKey = `${coachKey}-${actorKey}`;
             pairCountCoach[pairKey] = (pairCountCoach[pairKey] || 0) + 1;
 
             // Aggregate audience count for each person
-            audienceCountByPerson[actor] = (audienceCountByPerson[actor] || 0) + audienceCount;
+            audienceCountByPerson[actorKey] = (audienceCountByPerson[actorKey] || 0) + audienceCount;
         });
 
-        audienceCountByPerson[coach] = (audienceCountByPerson[coach] || 0) + audienceCount;
+        audienceCountByPerson[coachKey] = (audienceCountByPerson[coachKey] || 0) + audienceCount;
     });
 
     // Create edges for coach-actor pairs that have worked together in at least two movies
     Object.entries(pairCountCoach).forEach(([pairKey, count]) => {
         if (count >= 2) { // Change count threshold as needed
-            const [coach, actor] = pairKey.split('-');
-            edges.push({ from: coach, to: actor, color: '#cccccc' });
-            connectedNodes.add(coach);
-            connectedNodes.add(actor);
+            const [coachKey, actorKey] = pairKey.split('-');
+            edges.push({ from: coachKey, to: actorKey, color: '#cccccc' });
+            connectedNodes.add(coachKey);
+            connectedNodes.add(actorKey);
         }
     });
 
     // Only add nodes that are connected by at least one edge
     const nodes = [];
-    connectedNodes.forEach(node => {
-        const isCoach = coachSet.has(node);
+    connectedNodes.forEach(nodeKey => {
+        const isCoach = coachSet.has(nodeKey);
+        const displayName = nodeKey.replace(/^배우_|^감독_/, ''); // Remove the prefix
         const shape = isCoach ? 'dot' : 'star'; // Dot for coaches, Star for actors
         const color = isCoach ? 'skyblue' : 'orange'; // Skyblue for coaches, Orange for actors
-        const size = (audienceCountByPerson[node] / 10000000) || 1; // Size based on audience count, default to 1 if undefined
-        const audienceCountInMillions = (audienceCountByPerson[node] / 10000000).toFixed(2); // Audience count in millions
+        const size = (audienceCountByPerson[nodeKey] / 10000000) || 1; // Size based on audience count, default to 1 if undefined
+        const audienceCountInMillions = (audienceCountByPerson[nodeKey] / 10000000).toFixed(2); // Audience count in millions
 
         nodes.push({
-            id: node,
-            label: node,
+            id: nodeKey,
+            label: displayName, // Only show the name
             color: color,
             shape: shape,
             value: size,
@@ -93,17 +97,20 @@
     // Function to highlight a specific coach or actor and their connected nodes and edges
     function highlightPerson(personName) {
         // Only proceed if the person exists in the connected nodes
-        if (!connectedNodes.has(personName)) {
+        const coachKey = `감독_${personName}`;
+        const actorKey = `배우_${personName}`;
+        const isPersonConnected = connectedNodes.has(coachKey) || connectedNodes.has(actorKey);
+        if (!isPersonConnected) {
             return; // Do nothing if the person isn't found
         }
 
         resetColors(); // Reset the colors first
 
         const connectedEdges = [];
-        const connectedNodesSet = new Set([personName]);
+        const connectedNodesSet = new Set();
 
         dataSet.edges.forEach(edge => {
-            if (edge.from === personName || edge.to === personName) {
+            if (edge.from === coachKey || edge.to === coachKey || edge.from === actorKey || edge.to === actorKey) {
                 connectedEdges.push({
                     id: edge.id,
                     from: edge.from,
@@ -117,10 +124,12 @@
 
         dataSet.edges.update(connectedEdges);
 
+        const personKey = connectedNodes.has(coachKey) ? coachKey : actorKey;
+        connectedNodesSet.add(personKey);
         const updatedNodes = Array.from(connectedNodesSet).map(node => ({
             id: node,
-            label: node,
-            color: node === personName ? 'red' : (coachSet.has(node) ? 'skyblue' : 'orange'), // Red for highlighted, otherwise skyblue or orange
+            label: node.replace(/^배우_|^감독_/, ''), // Only show the name
+            color: node === personKey ? 'red' : (coachSet.has(node) ? 'skyblue' : 'orange'), // Red for highlighted, otherwise skyblue or orange
             shape: coachSet.has(node) ? 'dot' : 'star', // Dot for coaches, Star for actors
             font: { size: 30 }, // Ensure font size is maintained
             value: (audienceCountByPerson[node] / 10000000) || 1 // Retain node size based on audience count
